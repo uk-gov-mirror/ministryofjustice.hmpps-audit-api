@@ -12,8 +12,8 @@ ingress:
   enabled: true
   enable_whitelist: true
   hosts:
-    - host: hmpps-audit-api-dev.hmpps.service.justice.gov.uk
-      cert_secret: hmpps-audit-api-cert
+    - host: audit-api-dev.hmpps.service.justice.gov.uk
+      cert_secret: audit-api-cert
   path: /
 
 env:
