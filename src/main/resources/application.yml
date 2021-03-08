@@ -49,3 +49,13 @@ management:
     info:
       cache:
         time-to-live: 2000ms
+
+aws:
+  provider: aws
+  region: eu-west-2
+
+sqs:
+  provider: ${aws.provider}
+  queue.name: hmpps_audit_queue
+  dlq.name: hmpps_audit_dlq
+  endpoint.region: ${aws.region}

@@ -21,6 +21,18 @@ class HealthCheckTest : IntegrationTestBase() {
   }
 
   @Test
+  fun `Queue health reports queue details`() {
+    webTestClient.get().uri("/health")
+      .exchange()
+      .expectStatus().isOk
+      .expectBody()
+      .jsonPath("components.hmppsAuditQueueHealth.details.MessagesOnQueue").isEqualTo(0)
+      .jsonPath("components.hmppsAuditQueueHealth.details.MessagesInFlight").isEqualTo(0)
+      .jsonPath("components.hmppsAuditQueueHealth.details.MessagesOnDLQ").isEqualTo(0)
+      .jsonPath("components.hmppsAuditQueueHealth.details.dlqStatus").isEqualTo("UP")
+  }
+
+  @Test
   fun `Health info reports version`() {
     webTestClient.get().uri("/health")
       .exchange()
