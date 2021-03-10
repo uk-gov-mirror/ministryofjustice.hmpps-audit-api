@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
-import uk.gov.justice.digital.hmpps.hmppsauditapi.helpers.auditMessage
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -34,17 +33,15 @@ class AuditTest {
 
   @Test
   fun `will consume an audit event message`() {
-    val message = auditMessage(
-      """
-      {
-        "what": "OFFENDER_DELETED",
-        "when": "2021-01-25T12:30:00",
-        "who": "bobby.beans",
-        "service": "offender-service",
-        "details": "{ \"offenderId\": \"99\"}"
-      }
-    """
-    )
+    val message = """
+    {
+      "what": "OFFENDER_DELETED",
+      "when": "2021-01-25T12:30:00",
+      "who": "bobby.beans",
+      "service": "offender-service",
+      "details": "{ \"offenderId\": \"99\"}"
+    }
+  """
 
     await untilCallTo { getNumberOfMessagesCurrentlyOnQueue() } matches { it == 0 }
 

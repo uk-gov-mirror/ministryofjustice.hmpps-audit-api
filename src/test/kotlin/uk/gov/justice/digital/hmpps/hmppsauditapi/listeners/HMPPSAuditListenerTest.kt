@@ -6,7 +6,6 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.hmppsauditapi.helpers.auditMessage
 import uk.gov.justice.digital.hmpps.hmppsauditapi.services.AuditService
 
 internal class HMPPSAuditListenerTest {
@@ -17,17 +16,15 @@ internal class HMPPSAuditListenerTest {
 
   @Test
   internal fun `will call service for an audit event`() {
-    val message = auditMessage(
-      """
-      {
-        "what": "OFFENDER_DELETED",
-        "when": "2021-01-25T12:30:00",
-        "who": "bobby.beans",
-        "service": "offender-service",
-        "details": "{ \"offenderId\": \"99\"}"
-      }
-    """
-    )
+    val message = """
+    {
+      "what": "OFFENDER_DELETED",
+      "when": "2021-01-25T12:30:00",
+      "who": "bobby.beans",
+      "service": "offender-service",
+      "details": "{ \"offenderId\": \"99\"}"
+    }
+  """
     listener.onAuditEvent(message)
 
     verify(auditService).audit(
