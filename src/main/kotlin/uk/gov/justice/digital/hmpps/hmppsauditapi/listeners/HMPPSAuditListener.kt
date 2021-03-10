@@ -19,8 +19,8 @@ class HMPPSAuditListener(
 
   @JmsListener(destination = "\${sqs.queue.name}")
   fun onAuditEvent(message: String) {
+    log.debug("Received message $message")
     val sqsMessage: SQSMessage = gson.fromJson(message, SQSMessage::class.java)
-    log.debug("Received message ${sqsMessage.MessageId}")
     val auditEvent: AuditEvent = gson.fromJson(sqsMessage.Message, AuditEvent::class.java)
     auditService.audit(auditEvent)
   }
