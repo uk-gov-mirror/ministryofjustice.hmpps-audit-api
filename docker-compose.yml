@@ -13,6 +13,20 @@ services:
       - SERVER_PORT=8080
       - SPRING_PROFILES_ACTIVE=dev
 
+  audit-db:
+    image: postgres
+    networks:
+      - hmpps
+    container_name: audit-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin_password
+      - DATABASE_NAME=audit-db
+      - DATABASE_ENDPOINT=audit-db
+
   localstack:
     image: localstack/localstack:0.11.2
     networks:

@@ -6,3 +6,12 @@ aws:
 
 sqs:
   endpoint.url: http://localhost:4576
+
+  spring:
+    datasource:
+      url: 'jdbc:h2:mem:audit-db;MODE=PostgreSQL'
+    h2:
+      console:
+        enabled: true
+    jpa:
+      show-sql: true
