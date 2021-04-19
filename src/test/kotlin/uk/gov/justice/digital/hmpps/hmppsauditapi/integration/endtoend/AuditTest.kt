@@ -1,22 +1,25 @@
 package uk.gov.justice.digital.hmpps.hmppsauditapi.integration.endtoend
-
 import com.amazonaws.services.sqs.AmazonSQS
 import com.microsoft.applicationinsights.TelemetryClient
 import com.nhaarman.mockitokotlin2.check
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.isNull
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.matches
 import org.awaitility.kotlin.untilCallTo
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers.any
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
+import uk.gov.justice.digital.hmpps.hmppsauditapi.jpa.AuditRepository
+import uk.gov.justice.digital.hmpps.hmppsauditapi.listeners.HMPPSAuditListener
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -30,6 +33,9 @@ class AuditTest {
 
   @MockBean
   lateinit var telemetryClient: TelemetryClient
+
+  @MockBean
+  lateinit var auditRepository: AuditRepository
 
   @Test
   fun `will consume an audit event message`() {
@@ -60,6 +66,7 @@ class AuditTest {
       },
       isNull()
     )
+    verify(auditRepository, times(1)).save(any(HMPPSAuditListener.AuditEvent::class.java))
   }
 
   fun getNumberOfMessagesCurrentlyOnQueue(): Int? {
