@@ -22,7 +22,7 @@ class AuditService(private val telemetryClient: TelemetryClient, private val aud
 }
 
 private fun AuditEvent.asMap(): Map<String, String> {
-  var items = mapOf("what" to this.what, "when" to this.`when`)
+  var items = mapOf("what" to this.what!!, "when" to this.`when`.toString())
   this.who?.let { items = items + ("who" to it) }
   this.service?.let { items = items + ("service" to it) }
   this.details?.let { items = items + ("details" to it) }

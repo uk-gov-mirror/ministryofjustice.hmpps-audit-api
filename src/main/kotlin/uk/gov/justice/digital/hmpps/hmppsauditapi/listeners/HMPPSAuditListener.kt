@@ -1,11 +1,12 @@
 package uk.gov.justice.digital.hmpps.hmppsauditapi.listeners
 
-import com.google.gson.Gson
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.jms.annotation.JmsListener
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.hmppsauditapi.services.AuditService
+import java.time.Instant
 import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -16,7 +17,7 @@ import javax.persistence.Table
 @Service
 class HMPPSAuditListener(
   private val auditService: AuditService,
-  private val gson: Gson
+  private val mapper: ObjectMapper
 ) {
 
   companion object {
@@ -26,7 +27,7 @@ class HMPPSAuditListener(
   @JmsListener(destination = "\${sqs.queue.name}")
   fun onAuditEvent(message: String) {
     log.debug("Received message $message")
-    val auditEvent: AuditEvent = gson.fromJson(message, AuditEvent::class.java)
+    val auditEvent: AuditEvent = mapper.readValue(message, AuditEvent::class.java)
     auditService.audit(auditEvent)
   }
 
@@ -35,13 +36,13 @@ class HMPPSAuditListener(
   data class AuditEvent(
     @Id
     @GeneratedValue
-    val id: UUID,
+    val id: UUID? = null,
 
-    val what: String,
+    val what: String? = null,
     @Column(name = "occurred", nullable = false)
-    val `when`: String,
+    val `when`: Instant? = null,
     val who: String? = null,
     val service: String? = null,
-    val details: String? = null,
+    val details: String? = null
   )
 }
