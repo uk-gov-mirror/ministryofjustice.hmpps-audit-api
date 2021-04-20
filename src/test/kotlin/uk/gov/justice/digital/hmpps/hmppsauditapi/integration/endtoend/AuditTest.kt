@@ -42,7 +42,7 @@ class AuditTest {
     val message = """
     {
       "what": "OFFENDER_DELETED",
-      "when": "2021-01-25T12:30:00",
+      "when": "2021-01-25T12:30:00Z",
       "who": "bobby.beans",
       "service": "offender-service",
       "details": "{ \"offenderId\": \"99\"}"
@@ -59,7 +59,7 @@ class AuditTest {
       eq("hmpps-audit"),
       check {
         assertThat(it["what"]).isEqualTo("OFFENDER_DELETED")
-        assertThat(it["when"]).isEqualTo("2021-01-25T12:30:00")
+        assertThat(it["when"]).isEqualTo("2021-01-25T12:30:00Z")
         assertThat(it["who"]).isEqualTo("bobby.beans")
         assertThat(it["service"]).isEqualTo("offender-service")
         assertThat(it["details"]).isEqualTo("{ \"offenderId\": \"99\"}")

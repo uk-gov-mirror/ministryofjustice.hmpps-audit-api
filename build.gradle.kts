@@ -14,8 +14,8 @@ dependencies {
   implementation(platform("com.amazonaws:aws-java-sdk-bom:1.11.1000"))
   implementation("com.amazonaws:amazon-sqs-java-messaging-lib:1.0.8")
   implementation("org.apache.commons:commons-lang3:3.12.0")
-
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
   runtimeOnly("com.h2database:h2:1.4.200")
   runtimeOnly("org.flywaydb:flyway-core:7.8.1")
   runtimeOnly("org.postgresql:postgresql:42.2.19")
