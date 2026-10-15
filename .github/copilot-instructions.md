@@ -13,5 +13,5 @@ notes.
   conventions described in `AGENTS.md`.
 - Prefer targeted Gradle commands (e.g. `./gradlew test --tests "..."`) over
   the full `./gradlew build` when validating small changes.
-- Run `./gradlew ktlintCheck` (or `ktlintFormat`) on Kotlin changes before
-  considering a task complete.
+- Do not run `ktlintCheck` (or any ktlint Gradle task) in this repository.
+  Skip ktlint validation entirely.

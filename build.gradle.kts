@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.11"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.12"
   kotlin("plugin.spring") version "2.4.20"
   kotlin("plugin.jpa") version "2.4.20"
 }
@@ -38,8 +38,8 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.1")
 
   implementation("org.apache.commons:commons-lang3:3.21.0")
-  implementation("software.amazon.awssdk:s3:2.55.10")
-  implementation("software.amazon.awssdk:athena:2.55.10")
+  implementation("software.amazon.awssdk:s3:2.55.16")
+  implementation("software.amazon.awssdk:athena:2.55.16")
   implementation("org.apache.parquet:parquet-avro:1.18.1")
   implementation("org.apache.avro:avro:1.12.2")
   implementation("org.apache.hadoop:hadoop-client:3.5.0") {
@@ -64,7 +64,7 @@ dependencies {
   runtimeOnly("com.h2database:h2:2.5.252")
   runtimeOnly("org.flywaydb:flyway-core")
   runtimeOnly("org.flywaydb:flyway-database-postgresql")
-  runtimeOnly("org.postgresql:postgresql:42.7.13")
+  runtimeOnly("org.postgresql:postgresql:42.7.14")
 
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.0.3")
   testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
