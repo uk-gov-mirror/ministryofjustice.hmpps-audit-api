@@ -1,11 +1,8 @@
 package uk.gov.justice.digital.hmpps.hmppsauditapi.jpa
 
-import jakarta.persistence.QueryHint
-import org.hibernate.jpa.HibernateHints
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.jpa.repository.QueryHints
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
