@@ -22,6 +22,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import uk.gov.justice.digital.hmpps.hmppsauditapi.listeners.model.AuditEvent
 import java.nio.file.Files
 import java.security.MessageDigest
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.Base64
@@ -153,6 +154,56 @@ class AuditS3ClientTest {
       assertThat(exception.message).isEqualTo("ID cannot be null")
       then(s3Client).shouldHaveNoInteractions()
     }
+  }
+
+  @Nested
+  inner class DailyFile {
+    @Test
+    fun `writeParquetFile should write every event to a single file and return the count`() {
+      val events = (1..3).map { auditEvent(UUID.randomUUID(), "event $it") }
+      val file = Files.createTempFile("daily-test", ".parquet")
+      try {
+        val count = auditS3Client.writeParquetFile(events.asSequence(), file)
+
+        assertThat(count).isEqualTo(3)
+        AvroParquetReader.builder<GenericRecord>(Path(file.toUri())).build().use { reader ->
+          val records = generateSequence { reader.read() }.toList()
+          assertThat(records.map { it.get("id").toString() }).containsExactlyElementsOf(events.map { it.id.toString() })
+          assertThat(records.map { it.get("what").toString() }).containsExactly("event 1", "event 2", "event 3")
+        }
+      } finally {
+        Files.deleteIfExists(file)
+      }
+    }
+
+    @Test
+    fun `uploadDailyFile should upload to a date only key with an MD5 checksum`() {
+      val file = Files.createTempFile("daily-test", ".parquet")
+      try {
+        Files.write(file, "some parquet content".toByteArray())
+
+        val key = auditS3Client.uploadDailyFile(file, "auditBucketName", LocalDate.of(2025, 3, 7))
+
+        assertThat(key).isEqualTo("daily/year=2025/month=3/day=7/audit.parquet")
+        verify(s3Client).putObject(putObjectRequestCaptor.capture(), requestBodyCaptor.capture())
+        val putObjectRequest = putObjectRequestCaptor.value
+        assertThat(putObjectRequest.bucket()).isEqualTo("auditBucketName")
+        assertThat(putObjectRequest.key()).isEqualTo(key)
+        val expectedMd5 = Base64.getEncoder().encodeToString(MessageDigest.getInstance("MD5").digest("some parquet content".toByteArray()))
+        assertThat(putObjectRequest.contentMD5()).isEqualTo(expectedMd5)
+        assertThat(requestBodyCaptor.value.contentStreamProvider().newStream().readAllBytes()).isEqualTo("some parquet content".toByteArray())
+      } finally {
+        Files.deleteIfExists(file)
+      }
+    }
+
+    private fun auditEvent(id: UUID, what: String) = AuditEvent(
+      id = id,
+      what = what,
+      `when` = LocalDateTime.of(2025, 3, 7, 13, 30).toInstant(ZoneOffset.UTC),
+      who = "testUser",
+      service = "some service",
+    )
   }
 
   private fun verifyUploadedFileContents(
