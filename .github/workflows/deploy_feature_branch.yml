@@ -5,7 +5,7 @@ on:
     inputs:
       deploy-to-dev:
         description: Deploy the branch to dev?
-        default: true
+        default: false
         required: false
         type: boolean
 
