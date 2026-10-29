@@ -10,6 +10,7 @@ generic-service:
   env:
     OAUTH_ENDPOINT_URL: "http://hmpps-auth.hmpps-auth-prod.svc.cluster.local/auth"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
+    APPLICATIONINSIGHTS_AUDIT_EVENT_DETAILS: false
     SAVE_TO_S3_BUCKET: false
 
 # CloudPlatform AlertManager receiver to route promethues alerts to slack

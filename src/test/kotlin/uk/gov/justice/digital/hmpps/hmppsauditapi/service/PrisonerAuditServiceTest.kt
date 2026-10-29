@@ -4,6 +4,8 @@ import com.microsoft.applicationinsights.TelemetryClient
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -43,6 +45,7 @@ class PrisonerAuditServiceTest {
       auditAthenaClient,
       athenaPropertiesFactory,
       saveToS3Bucket,
+      auditEventDetails = false,
     )
 
   @Nested
@@ -390,7 +393,7 @@ class PrisonerAuditServiceTest {
 
     @Test
     fun `save audit event to database when saveToS3Bucket is false`() {
-      auditService = PrisonerAuditService(telemetryClient, prisonerAuditRepository, auditS3Client, auditAthenaClient, athenaPropertiesFactory, false)
+      auditService = PrisonerAuditService(telemetryClient, prisonerAuditRepository, auditS3Client, auditAthenaClient, athenaPropertiesFactory, false, auditEventDetails = false)
 
       auditService.saveAuditEvent(auditEvent)
 
@@ -402,13 +405,68 @@ class PrisonerAuditServiceTest {
     @Test
     fun `save audit event to S3 bucket when saveToS3Bucket is true`() {
       whenever(athenaPropertiesFactory.getProperties(AuditEventType.PRISONER)).thenReturn(athenaProperties)
-      auditService = PrisonerAuditService(telemetryClient, prisonerAuditRepository, auditS3Client, auditAthenaClient, athenaPropertiesFactory, true)
+      auditService = PrisonerAuditService(telemetryClient, prisonerAuditRepository, auditS3Client, auditAthenaClient, athenaPropertiesFactory, true, auditEventDetails = false)
 
       auditService.saveAuditEvent(auditEvent)
 
       then(auditS3Client).should().save(auditEvent, athenaProperties.s3BucketName)
       then(auditAthenaClient).should().addPartitionForEvent(auditEvent, athenaProperties)
       then(prisonerAuditRepository).should().save(auditEvent.toPrisonerAuditEvent())
+    }
+
+    private val telemetryProperties = mapOf(
+      "what" to "homepage views",
+      "when" to "2020-12-31T08:11:30Z",
+      "operationId" to "dadea6d876c62e2f5264c94c7b50875e",
+      "subjectId" to "fedea6d876c62e2f5264c94c7b50873w",
+      "subjectType" to "PERSON",
+      "correlationId" to "3rdea6d876c62e2f5264c94c7b508548",
+      "who" to "freddy.frog",
+      "service" to "hmpps-launchpad-ui",
+    )
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `include telemetry details only when auditEventDetails is true`(auditEventDetails: Boolean) {
+      auditService = PrisonerAuditService(
+        telemetryClient,
+        prisonerAuditRepository,
+        auditS3Client,
+        auditAthenaClient,
+        athenaPropertiesFactory,
+        saveToS3Bucket = false,
+        auditEventDetails = auditEventDetails,
+      )
+
+      auditService.saveAuditEvent(auditEvent)
+
+      val expectedProperties = if (auditEventDetails) {
+        telemetryProperties + ("details" to "{\"offenderId\": \"98\"}")
+      } else {
+        telemetryProperties
+      }
+      then(telemetryClient).should().trackEvent(AuditEventType.PRISONER.description, expectedProperties, null)
+      then(prisonerAuditRepository).should().save(auditEvent.toPrisonerAuditEvent())
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `omit null telemetry details regardless of auditEventDetails`(auditEventDetails: Boolean) {
+      auditService = PrisonerAuditService(
+        telemetryClient,
+        prisonerAuditRepository,
+        auditS3Client,
+        auditAthenaClient,
+        athenaPropertiesFactory,
+        saveToS3Bucket = false,
+        auditEventDetails = auditEventDetails,
+      )
+      val eventWithoutDetails = auditEvent.copy(details = null)
+
+      auditService.saveAuditEvent(eventWithoutDetails)
+
+      then(telemetryClient).should().trackEvent(AuditEventType.PRISONER.description, telemetryProperties, null)
+      then(prisonerAuditRepository).should().save(eventWithoutDetails.toPrisonerAuditEvent())
     }
   }
 

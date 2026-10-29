@@ -14,7 +14,7 @@ import uk.gov.justice.digital.hmpps.hmppsauditapi.jpa.StaffAuditRepository
 import uk.gov.justice.digital.hmpps.hmppsauditapi.jpa.model.toAuditEvent
 import uk.gov.justice.digital.hmpps.hmppsauditapi.listeners.model.AuditEvent
 import uk.gov.justice.digital.hmpps.hmppsauditapi.listeners.model.AuditEventType
-import uk.gov.justice.digital.hmpps.hmppsauditapi.listeners.model.asMap
+import uk.gov.justice.digital.hmpps.hmppsauditapi.listeners.model.toMap
 import uk.gov.justice.digital.hmpps.hmppsauditapi.listeners.model.toStaffAuditEvent
 import uk.gov.justice.digital.hmpps.hmppsauditapi.model.AuditFilterDto
 import uk.gov.justice.digital.hmpps.hmppsauditapi.model.AuditQueryRequest
@@ -32,6 +32,7 @@ class StaffAuditService(
   private val auditAthenaClient: AuditAthenaClient,
   private val athenaPropertiesFactory: AthenaPropertiesFactory,
   @param:Value("\${hmpps.repository.saveToS3Bucket}") private val saveToS3Bucket: Boolean,
+  @param:Value("\${hmpps.applicationinsights.auditEventDetails}") private val auditEventDetails: Boolean,
 
 ) : AuditServiceInterface {
   override fun saveAuditEvent(
@@ -46,7 +47,11 @@ class StaffAuditService(
 
     staffAuditRepository.save(auditEvent.toStaffAuditEvent())
 
-    telemetryClient.trackEvent(AuditEventType.STAFF.description, auditEvent.asMap())
+    if (auditEventDetails) {
+      telemetryClient.trackEvent(AuditEventType.STAFF.description, auditEvent.toMap(includeDetails = true))
+    } else {
+      telemetryClient.trackEvent(AuditEventType.STAFF.description, auditEvent.toMap(includeDetails = false))
+    }
   }
 
   override fun findAll(): List<AuditDto> = staffAuditRepository.findAll(Sort.by(DESC, "when")).map { AuditDto(it.toAuditEvent()) }

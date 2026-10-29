@@ -23,6 +23,8 @@ hmpps:
     saveToS3Bucket: true
   audit:
     queriesStartDate: 2024-01-01
+  applicationinsights:
+    auditEventDetails: True
   sqs:
     provider: localstack
     queues:

@@ -125,6 +125,8 @@ hmpps:
     saveToS3Bucket: ${SAVE_TO_S3_BUCKET}
   audit:
     queriesStartDate: 2024-01-01
+  applicationinsights:
+    auditEventDetails: ${APPLICATIONINSIGHTS_AUDIT_EVENT_DETAILS}
 
 
 oauth:

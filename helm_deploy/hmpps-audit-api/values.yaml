@@ -41,6 +41,7 @@ generic-service:
   env:
     SERVER_PORT: "8080"
     SPRING_PROFILES_ACTIVE: "logstash"
+    APPLICATIONINSIGHTS_AUDIT_EVENT_DETAILS: false
     SAVE_TO_S3_BUCKET: false
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.

@@ -41,7 +41,7 @@ data class AuditEvent(
   val details: String? = null,
 )
 
-fun AuditEvent.asMap(): Map<String, String> {
+fun AuditEvent.toMap(includeDetails: Boolean): Map<String, String> {
   val items = mutableMapOf("what" to what, "when" to `when`.toString())
   items.addIfNotNull("who", who)
   items.addIfNotNull("operationId", operationId)
@@ -49,6 +49,7 @@ fun AuditEvent.asMap(): Map<String, String> {
   items.addIfNotNull("subjectType", subjectType)
   items.addIfNotNull("correlationId", correlationId)
   items.addIfNotNull("service", service)
+  if (includeDetails) items.addIfNotNull("details", details)
   return items.toMap()
 }
 
