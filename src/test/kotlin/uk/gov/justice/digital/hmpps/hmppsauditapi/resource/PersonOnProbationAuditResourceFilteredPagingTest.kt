@@ -7,12 +7,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
+import org.springframework.test.context.TestPropertySource
 import uk.gov.justice.digital.hmpps.hmppsauditapi.IntegrationTest
 import uk.gov.justice.digital.hmpps.hmppsauditapi.jpa.PersonOnProbationAuditRepository
 import uk.gov.justice.digital.hmpps.hmppsauditapi.jpa.model.PersonOnProbationAuditEvent
 import java.time.Instant
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestPropertySource(properties = ["spring.datasource.url=jdbc:h2:mem:probation-filtered-paging;MODE=PostgreSQL"])
 class PersonOnProbationAuditResourceFilteredPagingTest : IntegrationTest() {
 
   @Autowired

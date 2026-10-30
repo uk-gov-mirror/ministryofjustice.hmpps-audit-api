@@ -51,11 +51,11 @@ class AuditS3ClientTest {
   fun setup() {
     auditS3Client = AuditS3Client(
       s3Client,
-      schema,
+      AuditParquetWriter(schema),
     )
     prisonerAuditS3Client = AuditS3Client(
       s3Client,
-      schema,
+      AuditParquetWriter(schema),
     )
   }
 
@@ -149,7 +149,8 @@ class AuditS3ClientTest {
         details = "some details",
       )
 
-      val exception = assertThrows<IllegalArgumentException> { prisonerAuditS3Client.save(prisonerAuditEvent, "prisonerBucket") }
+      val exception =
+        assertThrows<IllegalArgumentException> { prisonerAuditS3Client.save(prisonerAuditEvent, "prisonerBucket") }
       assertThat(exception.message).isEqualTo("ID cannot be null")
       then(s3Client).shouldHaveNoInteractions()
     }
